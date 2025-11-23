@@ -542,7 +542,7 @@ class DatabaseHelper {
   /// [questionId]: معرف السؤال
   /// [majorId]: معرف التخصص
   /// [optionIndex]: فهرس الخيار (0, 1, 2, 3)
-  /// [weight]: قيمة الوزن (عادة 0, 1, 2)
+  /// [weight]: قيمة الوزن (0, 1, 2, 3 فقط)
   /// Returns: معرف السجل المُدرج
   Future<int> insertQuestionWeight(
     int questionId,
@@ -592,7 +592,8 @@ class DatabaseHelper {
   /// 1. جلب جميع الأسئلة من قاعدة البيانات
   /// 2. لكل سؤال، جلب الأوزان المرتبطة بالخيار المختار
   /// 3. جمع الأوزان لكل تخصص
-  /// 4. إرجاع النتائج النهائية
+  /// 4. ترتيب التخصصات حسب النتيجة واختيار أول 4 تخصصات فقط
+  /// 5. إرجاع النتائج النهائية (4 أوزان فقط)
   Future<Map<int, int>> calculateScores(List<int> answers) async {
     final db = await database;
     final scores = <int, int>{};
@@ -619,7 +620,16 @@ class DatabaseHelper {
       }
     }
     
-    return scores;
+    // ترتيب التخصصات حسب النتيجة واختيار أول 4 تخصصات فقط
+    final sortedEntries = scores.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    
+    final topFourScores = <int, int>{};
+    for (int i = 0; i < sortedEntries.length && i < 4; i++) {
+      topFourScores[sortedEntries[i].key] = sortedEntries[i].value;
+    }
+    
+    return topFourScores;
   }
 
   // ==================== Quiz Results operations ====================

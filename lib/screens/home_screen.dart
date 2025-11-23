@@ -6,6 +6,7 @@ import 'majors_screen.dart';
 import 'quiz_screen.dart';
 import 'calculator_screen.dart';
 import 'about_screen.dart';
+import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -85,12 +86,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('دليلك الدراسي'),
-          backgroundColor: AppColors.darkBlue,
-          foregroundColor: Colors.white,
-        ),
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) {
+          if (!didPop) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginScreen(),
+              ),
+            );
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('دليلك الدراسي'),
+            backgroundColor: AppColors.darkBlue,
+            foregroundColor: Colors.white,
+          ),
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -215,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

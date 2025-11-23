@@ -5,7 +5,7 @@ class QuestionWeightModel {
   final int questionId;
   final int majorId;
   final int optionIndex; // 0, 1, 2, 3 للخيارات الأربعة
-  final int weight; // قيمة الوزن (عادة 0, 1, 2)
+  final int weight; // قيمة الوزن (0, 1, 2, 3 فقط)
 
   QuestionWeightModel({
     this.id,
@@ -51,6 +51,7 @@ class QuestionWeightModel {
     );
   }
 }
+
 
 
 

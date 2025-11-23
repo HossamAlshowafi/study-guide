@@ -160,7 +160,7 @@ class DatabaseService {
   /// questionId: معرف السؤال
   /// majorId: معرف التخصص
   /// optionIndex: فهرس الخيار (0, 1, 2, 3)
-  /// weight: قيمة الوزن (عادة 0, 1, 2)
+  /// weight: قيمة الوزن (0, 1, 2, 3 فقط)
   Future<int> insertQuestionWeight(
     int questionId,
     int majorId,

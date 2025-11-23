@@ -272,11 +272,28 @@ class _AdminQuestionsScreenState extends State<AdminQuestionsScreen> {
                                                     keyboardType:
                                                         TextInputType.number,
                                                     decoration: InputDecoration(
-                                                      labelText: 'الوزن',
+                                                      labelText: 'الوزن (0-3)',
                                                       border:
                                                           const OutlineInputBorder(),
                                                       isDense: true,
+                                                      helperText: 'القيم المسموحة: 0، 1، 2، 3',
                                                     ),
+                                                    onChanged: (value) {
+                                                      // التحقق من أن القيمة تكون فقط 0، 1، 2، 3
+                                                      if (value.isNotEmpty) {
+                                                        final intValue = int.tryParse(value);
+                                                        if (intValue == null || intValue < 0 || intValue > 3) {
+                                                          // إزالة الأحرف غير الصالحة
+                                                          final validValue = value.replaceAll(RegExp(r'[^0-3]'), '');
+                                                          if (validValue != value) {
+                                                            weightControllers[index][major.id]?.text = validValue;
+                                                            weightControllers[index][major.id]?.selection = TextSelection.fromPosition(
+                                                              TextPosition(offset: validValue.length),
+                                                            );
+                                                          }
+                                                        }
+                                                      }
+                                                    },
                                                   ),
                                                 ),
                                               ],
@@ -352,6 +369,7 @@ class _AdminQuestionsScreenState extends State<AdminQuestionsScreen> {
 
                                   // ========== الخطوة 2: حفظ الأوزان ==========
                                   // لكل خيار (0, 1, 2, 3)، لكل تخصص، احفظ الوزن إذا كان > 0
+                                  // الأوزان المسموحة: 0، 1، 2، 3 فقط
                                   // هذا يسمح بربط كل خيار بتخصصات متعددة بأوزان مختلفة
                                   print(
                                     'AdminQuestionsScreen: بدء حفظ الأوزان...',
@@ -371,15 +389,21 @@ class _AdminQuestionsScreenState extends State<AdminQuestionsScreen> {
                                         final weight =
                                             int.tryParse(weightText) ?? 0;
 
-                                        // حفظ الوزن فقط إذا كان > 0 لتوفير المساحة
-                                        if (weight > 0) {
-                                          await DatabaseService.instance
-                                              .insertQuestionWeight(
-                                                questionId,
-                                                major.id!,
-                                                optionIndex,
-                                                weight,
-                                              );
+                                        // التحقق من أن الوزن يكون فقط 0، 1، 2، 3
+                                        if (weight >= 0 && weight <= 3) {
+                                          // حفظ الوزن فقط إذا كان > 0 لتوفير المساحة
+                                          if (weight > 0) {
+                                            await DatabaseService.instance
+                                                .insertQuestionWeight(
+                                                  questionId,
+                                                  major.id!,
+                                                  optionIndex,
+                                                  weight,
+                                                );
+                                          }
+                                        } else {
+                                          // في حالة وجود وزن غير صالح، نستخدم 0
+                                          print('AdminQuestionsScreen: تحذير - وزن غير صالح ($weight) لخيار $optionIndex وتخصص ${major.name}، سيتم استخدام 0');
                                         }
                                       }
                                     }
