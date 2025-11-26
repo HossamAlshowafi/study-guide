@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../services/database_service.dart';
 import '../models/major_model.dart';
+import '../services/student_session.dart';
 import 'major_details_screen.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -56,14 +57,27 @@ class _ResultScreenState extends State<ResultScreen> {
       // 4. اختيار التخصصين الأعلى نقاطاً
       final topMajors = sortedMajors.take(2).map((e) => e.key).toList();
       
-      // 5. حفظ نتيجة الاختبار (التخصص الأول) في قاعدة البيانات
-      // هذا يُستخدم لتتبع الإحصائيات (عدد الطلاب، أكثر التخصصات المختارة)
+      // 5. حفظ نتيجة الاختبار (التخصص الأول) في سجل الطالب
       if (topMajors.isNotEmpty && topMajors.first.id != null) {
-        try {
-          await DatabaseService.instance.insertQuizResult(topMajors.first.id!);
-          print('ResultScreen: تم حفظ نتيجة الاختبار - التخصص: ${topMajors.first.name}');
-        } catch (e) {
-          print('ResultScreen: خطأ في حفظ نتيجة الاختبار - $e');
+        final currentStudent = StudentSession.currentStudent;
+        if (currentStudent != null) {
+          try {
+            await DatabaseService.instance.updateStudentResult(
+              studentId: currentStudent.id,
+              majorId: topMajors.first.id!,
+            );
+            StudentSession.setStudent(
+              currentStudent.copyWith(
+                lastResult: topMajors.first.id!,
+                updatedAt: DateTime.now().toIso8601String(),
+              ),
+            );
+            print('ResultScreen: تم تحديث نتيجة الطالب - ${currentStudent.id}');
+          } catch (e) {
+            print('ResultScreen: خطأ في تحديث نتيجة الطالب - $e');
+          }
+        } else {
+          print('ResultScreen: لا يوجد طالب مسجل لحفظ النتيجة');
         }
       }
       

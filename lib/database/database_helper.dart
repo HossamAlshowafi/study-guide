@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/major_model.dart';
 import '../models/question_model.dart';
+import '../models/student_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -21,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3, // زيادة الإصدار لإضافة quiz_results
+      version: 4, // زيادة الإصدار لإضافة جدول الطلاب
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -59,6 +60,19 @@ class DatabaseHelper {
       
       // إضافة الأسئلة الافتراضية إذا لم تكن موجودة
       await _insertDefaultQuestions(db);
+    }
+
+    if (oldVersion < 4) {
+      // إنشاء جدول الطلاب لتخزين نتائجهم الأخيرة
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS students (
+          studentId TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          lastResult INTEGER,
+          updatedAt TEXT NOT NULL,
+          FOREIGN KEY (lastResult) REFERENCES majors (id)
+        )
+      ''');
     }
   }
 
@@ -111,6 +125,17 @@ class DatabaseHelper {
         majorId INTEGER NOT NULL,
         createdAt TEXT NOT NULL,
         FOREIGN KEY (majorId) REFERENCES majors (id)
+      )
+    ''');
+
+    // Create students table
+    await db.execute('''
+      CREATE TABLE students (
+        studentId TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        lastResult INTEGER,
+        updatedAt TEXT NOT NULL,
+        FOREIGN KEY (lastResult) REFERENCES majors (id)
       )
     ''');
 
@@ -647,12 +672,10 @@ class DatabaseHelper {
     });
   }
 
-  /// جلب عدد الطلاب الذين قاموا بالاختبار
-  /// Returns: عدد نتائج الاختبارات المحفوظة
+  /// جلب عدد الطلاب الفريدين (معرف طالب واحد لكل سجل)
+  /// Returns: إجمالي عدد الطلاب المسجلين
   Future<int> getQuizResultsCount() async {
-    final db = await database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM quiz_results');
-    return Sqflite.firstIntValue(result) ?? 0;
+    return await getUniqueStudentsCount();
   }
 
   /// جلب أكثر التخصصات التي تم اختيارها
@@ -668,13 +691,68 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getMostSelectedMajors({int limit = 5}) async {
     final db = await database;
     return await db.rawQuery('''
-      SELECT m.id, m.name, COUNT(qr.id) as count
+      SELECT m.id, m.name, COUNT(s.studentId) as count
       FROM majors m
-      LEFT JOIN quiz_results qr ON m.id = qr.majorId
+      LEFT JOIN students s ON m.id = s.lastResult
       GROUP BY m.id, m.name
       ORDER BY count DESC
       LIMIT ?
     ''', [limit]);
+  }
+
+  // ==================== Students operations ====================
+
+  Future<int> createStudent(StudentModel student) async {
+    final db = await database;
+    return await db.insert('students', student.toMap());
+  }
+
+  Future<StudentModel?> getStudentById(String studentId) async {
+    final db = await database;
+    final maps = await db.query(
+      'students',
+      where: 'studentId = ?',
+      whereArgs: [studentId],
+    );
+    if (maps.isNotEmpty) {
+      return StudentModel.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<int> updateStudentName(String studentId, String name) async {
+    final db = await database;
+    return await db.update(
+      'students',
+      {
+        'name': name,
+        'updatedAt': DateTime.now().toIso8601String(),
+      },
+      where: 'studentId = ?',
+      whereArgs: [studentId],
+    );
+  }
+
+  Future<int> updateStudentResult({
+    required String studentId,
+    required int majorId,
+  }) async {
+    final db = await database;
+    return await db.update(
+      'students',
+      {
+        'lastResult': majorId,
+        'updatedAt': DateTime.now().toIso8601String(),
+      },
+      where: 'studentId = ?',
+      whereArgs: [studentId],
+    );
+  }
+
+  Future<int> getUniqueStudentsCount() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM students');
+    return Sqflite.firstIntValue(result) ?? 0;
   }
 
   Future<void> close() async {

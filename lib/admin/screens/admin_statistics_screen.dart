@@ -18,7 +18,7 @@ class AdminStatisticsScreen extends StatefulWidget {
 
 class _AdminStatisticsScreenState extends State<AdminStatisticsScreen> {
   List<Map<String, dynamic>> _mostSelectedMajors = [];
-  int _quizResultsCount = 0;
+  int _uniqueStudentsCount = 0;
   bool _isLoading = true;
 
   @override
@@ -47,7 +47,7 @@ class _AdminStatisticsScreenState extends State<AdminStatisticsScreen> {
       print('AdminStatisticsScreen: تم تحميل الإحصائيات - عدد الاختبارات: $quizCount');
       
       setState(() {
-        _quizResultsCount = quizCount;
+        _uniqueStudentsCount = quizCount;
         _mostSelectedMajors = mostSelected;
         _isLoading = false;
       });
@@ -124,7 +124,7 @@ class _AdminStatisticsScreenState extends State<AdminStatisticsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '$_quizResultsCount',
+                            '$_uniqueStudentsCount',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 36,

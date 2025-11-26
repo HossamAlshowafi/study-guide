@@ -2,6 +2,7 @@ import 'dart:async';
 import '../database/database_helper.dart';
 import '../models/major_model.dart';
 import '../models/question_model.dart';
+import '../models/student_model.dart';
 
 /// خدمة قاعدة البيانات الرئيسية
 /// 
@@ -223,6 +224,55 @@ class DatabaseService {
   /// جلب أكثر التخصصات التي تم اختيارها
   Future<List<Map<String, dynamic>>> getMostSelectedMajors({int limit = 5}) async {
     return await DatabaseHelper.instance.getMostSelectedMajors(limit: limit);
+  }
+
+  // ==================== Students ====================
+
+  Future<StudentModel> createOrGetStudent({
+    required String studentId,
+    required String name,
+  }) async {
+    final existing = await DatabaseHelper.instance.getStudentById(studentId);
+    if (existing != null) {
+      if (existing.name != name) {
+        await DatabaseHelper.instance.updateStudentName(studentId, name);
+        notifyChanges();
+        return existing.copyWith(
+          name: name,
+          updatedAt: DateTime.now().toIso8601String(),
+        );
+      }
+      return existing;
+    }
+
+    final student = StudentModel(
+      id: studentId,
+      name: name,
+      lastResult: null,
+      updatedAt: DateTime.now().toIso8601String(),
+    );
+
+    await DatabaseHelper.instance.createStudent(student);
+    notifyChanges();
+    return student;
+  }
+
+  Future<StudentModel?> getStudentById(String studentId) async {
+    return await DatabaseHelper.instance.getStudentById(studentId);
+  }
+
+  Future<int> updateStudentResult({
+    required String studentId,
+    required int majorId,
+  }) async {
+    final result = await DatabaseHelper.instance.updateStudentResult(
+      studentId: studentId,
+      majorId: majorId,
+    );
+    if (result > 0) {
+      notifyChanges();
+    }
+    return result;
   }
 
   void dispose() {

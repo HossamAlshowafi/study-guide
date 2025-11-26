@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../widgets/custom_button.dart';
 import '../services/quiz_service.dart';
+import '../services/student_session.dart';
 import 'majors_screen.dart';
 import 'quiz_screen.dart';
 import 'calculator_screen.dart';
@@ -17,6 +18,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingQuiz = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (StudentSession.currentStudent == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ),
+        );
+      }
+    });
+  }
 
   /// تهيئة الاختبار والانتقال إلى شاشة الاختبار
   /// 
@@ -90,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
         canPop: false,
         onPopInvoked: (didPop) {
           if (!didPop) {
+            StudentSession.clear();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

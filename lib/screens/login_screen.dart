@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
-import 'home_screen.dart';
 import 'admin_placeholder_screen.dart';
+import 'student_info_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -81,10 +81,10 @@ class LoginScreen extends StatelessWidget {
                       height: 70,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
+                              builder: (context) => const StudentInfoScreen(),
                             ),
                           );
                         },
