@@ -5,17 +5,30 @@ import '../services/database_service.dart';
 import '../services/student_session.dart';
 import 'home_screen.dart';
 
-class StudentInfoScreen extends StatefulWidget {
-  const StudentInfoScreen({super.key});
+class RegisterStudentScreen extends StatefulWidget {
+  final String? preFilledStudentId;
+
+  const RegisterStudentScreen({
+    super.key,
+    this.preFilledStudentId,
+  });
 
   @override
-  State<StudentInfoScreen> createState() => _StudentInfoScreenState();
+  State<RegisterStudentScreen> createState() => _RegisterStudentScreenState();
 }
 
-class _StudentInfoScreenState extends State<StudentInfoScreen> {
+class _RegisterStudentScreenState extends State<RegisterStudentScreen> {
   final _studentIdController = TextEditingController();
   final _studentNameController = TextEditingController();
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.preFilledStudentId != null) {
+      _studentIdController.text = widget.preFilledStudentId!;
+    }
+  }
 
   @override
   void dispose() {
@@ -24,33 +37,46 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
     super.dispose();
   }
 
-  Future<void> _handleContinue() async {
+  Future<void> _handleRegister() async {
     FocusScope.of(context).unfocus();
     final studentId = _studentIdController.text.trim();
     final studentName = _studentNameController.text.trim();
 
-    if (studentId.isEmpty || studentName.isEmpty) {
-      _showMessage('يرجى إدخال رقم الطالب والاسم');
+    // Validate studentName
+    if (studentName.isEmpty) {
+      _showMessage('يرجى إدخال اسم الطالب');
+      return;
+    }
+
+    // Validate studentName contains letters only (Arabic and English)
+    if (!RegExp(r'^[\u0600-\u06FFa-zA-Z\s]+$').hasMatch(studentName)) {
+      _showMessage('اسم الطالب يجب أن يحتوي على أحرف فقط');
+      return;
+    }
+
+    // Validate studentId
+    if (studentId.isEmpty) {
+      _showMessage('يرجى إدخال الرقم التعريفي');
       return;
     }
 
     if (!RegExp(r'^\d+$').hasMatch(studentId)) {
-      _showMessage('رقم الطالب يجب أن يحتوي على أرقام فقط');
+      _showMessage('الرقم التعريفي يجب أن يحتوي على أرقام فقط');
       return;
     }
 
     setState(() => _isSubmitting = true);
 
     try {
-      // التحقق من وجود الرقم التعريفي مسبقاً
+      // Check if ID already exists
       final existingStudent = await DatabaseService.instance.getStudentById(studentId);
       if (existingStudent != null) {
-        _showMessage('الرقم التعريفي هذا مسجل مسبقاً، الرجاء استخدام رقم آخر');
+        _showMessage('الرقم التعريفي مستخدم مسبقًا. الرجاء إدخال رقم جديد.');
         setState(() => _isSubmitting = false);
         return;
       }
 
-      // إنشاء طالب جديد
+      // Create new student
       final student = await DatabaseService.instance.createOrGetStudent(
         studentId: studentId,
         name: studentName,
@@ -64,7 +90,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
       );
     } catch (e) {
       _showMessage('حدث خطأ أثناء حفظ البيانات. حاول مرة أخرى.');
-      print('StudentInfoScreen: خطأ أثناء حفظ بيانات الطالب - $e');
+      print('RegisterStudentScreen: خطأ أثناء حفظ بيانات الطالب - $e');
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -99,13 +125,13 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      Icons.person_outline,
+                      Icons.person_add_outlined,
                       size: 80,
                       color: Colors.white,
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'تسجيل الدخول',
+                      'تسجيل طالب جديد',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -132,7 +158,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                       width: double.infinity,
                       height: 70,
                       child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _handleContinue,
+                        onPressed: _isSubmitting ? null : _handleRegister,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.darkBlue,
@@ -146,7 +172,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                                 color: AppColors.darkBlue,
                               )
                             : const Text(
-                                'متابعة',
+                                'تسجيل',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -195,3 +221,5 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
     );
   }
 }
+
+

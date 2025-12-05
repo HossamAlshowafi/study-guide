@@ -4,72 +4,74 @@ import '../utils/app_colors.dart';
 import '../services/database_service.dart';
 import '../services/student_session.dart';
 import 'home_screen.dart';
+import 'register_student_screen.dart';
 
-class StudentInfoScreen extends StatefulWidget {
-  const StudentInfoScreen({super.key});
+class LoginStudentScreen extends StatefulWidget {
+  const LoginStudentScreen({super.key});
 
   @override
-  State<StudentInfoScreen> createState() => _StudentInfoScreenState();
+  State<LoginStudentScreen> createState() => _LoginStudentScreenState();
 }
 
-class _StudentInfoScreenState extends State<StudentInfoScreen> {
+class _LoginStudentScreenState extends State<LoginStudentScreen> {
   final _studentIdController = TextEditingController();
-  final _studentNameController = TextEditingController();
-  bool _isSubmitting = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _studentIdController.dispose();
-    _studentNameController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleContinue() async {
+  Future<void> _handleLogin() async {
     FocusScope.of(context).unfocus();
     final studentId = _studentIdController.text.trim();
-    final studentName = _studentNameController.text.trim();
 
-    if (studentId.isEmpty || studentName.isEmpty) {
-      _showMessage('يرجى إدخال رقم الطالب والاسم');
+    if (studentId.isEmpty) {
+      _showMessage('الرجاء إدخال رقم تعريفي صحيح مكوّن من أرقام فقط.');
       return;
     }
 
     if (!RegExp(r'^\d+$').hasMatch(studentId)) {
-      _showMessage('رقم الطالب يجب أن يحتوي على أرقام فقط');
+      _showMessage('الرجاء إدخال رقم تعريفي صحيح مكوّن من أرقام فقط.');
       return;
     }
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isLoading = true);
 
     try {
-      // التحقق من وجود الرقم التعريفي مسبقاً
-      final existingStudent = await DatabaseService.instance.getStudentById(studentId);
-      if (existingStudent != null) {
-        _showMessage('الرقم التعريفي هذا مسجل مسبقاً، الرجاء استخدام رقم آخر');
-        setState(() => _isSubmitting = false);
-        return;
-      }
-
-      // إنشاء طالب جديد
-      final student = await DatabaseService.instance.createOrGetStudent(
-        studentId: studentId,
-        name: studentName,
-      );
-      StudentSession.setStudent(student);
+      final student = await DatabaseService.instance.getStudentById(studentId);
 
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } catch (e) {
-      _showMessage('حدث خطأ أثناء حفظ البيانات. حاول مرة أخرى.');
-      print('StudentInfoScreen: خطأ أثناء حفظ بيانات الطالب - $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
+
+      if (student != null) {
+        // Student exists - proceed to HomeScreen
+        StudentSession.setStudent(student);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      } else {
+        // Student does not exist - show message
+        setState(() => _isLoading = false);
+        _showMessage('الرقم التعريفي غير مسجل. الرجاء إنشاء حساب جديد.');
       }
+    } catch (e) {
+      _showMessage('حدث خطأ أثناء التحقق من البيانات. حاول مرة أخرى.');
+      print('LoginStudentScreen: خطأ أثناء التحقق من الطالب - $e');
+      setState(() => _isLoading = false);
     }
+  }
+
+  void _navigateToRegister() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RegisterStudentScreen(
+          preFilledStudentId: _studentIdController.text.trim(),
+        ),
+      ),
+    );
   }
 
   void _showMessage(String message) {
@@ -114,25 +116,18 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                     ),
                     const SizedBox(height: 24),
                     _buildTextField(
-                      controller: _studentNameController,
-                      label: 'اسم الطالب',
-                      hint: 'أدخل اسم الطالب',
-                      keyboardType: TextInputType.name,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
                       controller: _studentIdController,
                       label: 'الرقم التعريفي',
                       hint: 'أدخل الرقم التعريفي',
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       height: 70,
                       child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _handleContinue,
+                        onPressed: _isLoading ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.darkBlue,
@@ -141,17 +136,43 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
                           ),
                           elevation: 8,
                         ),
-                        child: _isSubmitting
+                        child: _isLoading
                             ? const CircularProgressIndicator(
                                 color: AppColors.darkBlue,
                               )
                             : const Text(
-                                'متابعة',
+                                'تسجيل الدخول',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 70,
+                      child: ElevatedButton(
+                        onPressed: _navigateToRegister,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: const BorderSide(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          'تسجيل طالب جديد',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ],

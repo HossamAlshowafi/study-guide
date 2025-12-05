@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import 'admin_placeholder_screen.dart';
-import 'student_info_screen.dart';
+import 'login_student_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -84,7 +84,7 @@ class LoginScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const StudentInfoScreen(),
+                              builder: (context) => const LoginStudentScreen(),
                             ),
                           );
                         },

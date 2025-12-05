@@ -31,8 +31,10 @@ class DatabaseHelper {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       // Add displayOrder column
-      await db.execute('ALTER TABLE majors ADD COLUMN displayOrder INTEGER DEFAULT 0');
-      
+      await db.execute(
+        'ALTER TABLE majors ADD COLUMN displayOrder INTEGER DEFAULT 0',
+      );
+
       // Create question_weights table
       await db.execute('''
         CREATE TABLE IF NOT EXISTS question_weights (
@@ -46,7 +48,7 @@ class DatabaseHelper {
         )
       ''');
     }
-    
+
     if (oldVersion < 3) {
       // Create quiz_results table لتتبع نتائج الاختبارات
       await db.execute('''
@@ -57,7 +59,7 @@ class DatabaseHelper {
           FOREIGN KEY (majorId) REFERENCES majors (id)
         )
       ''');
-      
+
       // إضافة الأسئلة الافتراضية إذا لم تكن موجودة
       await _insertDefaultQuestions(db);
     }
@@ -141,7 +143,7 @@ class DatabaseHelper {
 
     // Insert default majors
     await _insertDefaultMajors(db);
-    
+
     // Insert default questions
     await _insertDefaultQuestions(db);
   }
@@ -150,59 +152,86 @@ class DatabaseHelper {
     final defaultMajors = [
       {
         'name': 'الهندسة المدنية',
-        'description': 'الهندسة المدنية هي أحد فروع الهندسة التي تتخصص في تصميم وتنفيذ المنشآت والبنى التحتية مثل الطرق والجسور والمباني والسدود والمطارات والموانئ.',
-        'requirements': 'دراسة الرياضيات والفيزياء بشكل متقدم، والقدرة على التحليل والتصميم، والمهارات التقنية في استخدام البرمجيات الهندسية.',
-        'careers': 'مهندس مدني، مهندس إنشاءات، مهندس طرق وجسور، مهندس بيئة، مستشار هندسي، إدارة المشاريع الهندسية.',
+        'description':
+            'الهندسة المدنية هي أحد فروع الهندسة التي تتخصص في تصميم وتنفيذ المنشآت والبنى التحتية مثل الطرق والجسور والمباني والسدود والمطارات والموانئ.',
+        'requirements':
+            'دراسة الرياضيات والفيزياء بشكل متقدم، والقدرة على التحليل والتصميم، والمهارات التقنية في استخدام البرمجيات الهندسية.',
+        'careers':
+            'مهندس مدني، مهندس إنشاءات، مهندس طرق وجسور، مهندس بيئة، مستشار هندسي، إدارة المشاريع الهندسية.',
         'imagePath': 'assets/images/Civil Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/1/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D8%AF%D9%86%D9%8A%D8%A9.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/1/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D8%AF%D9%86%D9%8A%D8%A9.pdf',
       },
       {
         'name': 'الهندسة الميكانيكية',
-        'description': 'الهندسة الميكانيكية هي أحد أوسع فروع الهندسة التي تتناول تصميم وتطوير وتصنيع النظم الميكانيكية والآلات.',
-        'requirements': 'مهارات رياضية وفيزيائية قوية، التفكير التحليلي، القدرة على تصميم النظم المعقدة، معرفة ببرامج التصميم الميكانيكي.',
-        'careers': 'مهندس ميكانيكي، مهندس تصنيع، مهندس صيانة، مهندس روافع، مهندس أنظمة الطاقة، مهندس سيارات.',
+        'description':
+            'الهندسة الميكانيكية هي أحد أوسع فروع الهندسة التي تتناول تصميم وتطوير وتصنيع النظم الميكانيكية والآلات.',
+        'requirements':
+            'مهارات رياضية وفيزيائية قوية، التفكير التحليلي، القدرة على تصميم النظم المعقدة، معرفة ببرامج التصميم الميكانيكي.',
+        'careers':
+            'مهندس ميكانيكي، مهندس تصنيع، مهندس صيانة، مهندس روافع، مهندس أنظمة الطاقة، مهندس سيارات.',
         'imagePath': 'assets/images/Mechanical Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/5/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D9%8A%D9%83%D8%A7%D9%86%D9%8A%D9%83%D9%8A%D8%A9.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/5/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D9%8A%D9%83%D8%A7%D9%86%D9%8A%D9%83%D9%8A%D8%A9.pdf',
       },
       {
         'name': 'الهندسة الكهربائية',
-        'description': 'الهندسة الكهربائية تهتم بدراسة وتطبيق الكهرباء والإلكترونيات والكهرومغناطيسية.',
-        'requirements': 'قدرة عالية في الرياضيات والفيزياء، فهم عميق للمبادئ الكهربائية، مهارات البرمجة، إتقان برامج المحاكاة والتصميم.',
-        'careers': 'مهندس كهربائي، مهندس أنظمة الطاقة، مهندس إلكترونيات، مهندس اتصالات، مهندس تحكم، مهندس أمن المعلومات.',
+        'description':
+            'الهندسة الكهربائية تهتم بدراسة وتطبيق الكهرباء والإلكترونيات والكهرومغناطيسية.',
+        'requirements':
+            'قدرة عالية في الرياضيات والفيزياء، فهم عميق للمبادئ الكهربائية، مهارات البرمجة، إتقان برامج المحاكاة والتصميم.',
+        'careers':
+            'مهندس كهربائي، مهندس أنظمة الطاقة، مهندس إلكترونيات، مهندس اتصالات، مهندس تحكم، مهندس أمن المعلومات.',
         'imagePath': 'assets/images/Electrical Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/3/Electrical%20Courses%20%20Syllabus.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/3/Electrical%20Courses%20%20Syllabus.pdf',
       },
       {
         'name': 'الهندسة الصناعية',
-        'description': 'الهندسة الصناعية تركز على تحسين النظم المعقدة والعمليات والمنظمات.',
-        'requirements': 'مهارات تحليلية قوية، فهم عمليات الإنتاج، القدرة على تحسين النظم، مهارات إدارة المشاريع، إتقان أدوات التحليل الإحصائي.',
-        'careers': 'مهندس صناعي، مهندس جودة، مهندس عمليات، مهندس سلسلة التوريد، محلل نظم، مستشار إداري.',
+        'description':
+            'الهندسة الصناعية تركز على تحسين النظم المعقدة والعمليات والمنظمات.',
+        'requirements':
+            'مهارات تحليلية قوية، فهم عمليات الإنتاج، القدرة على تحسين النظم، مهارات إدارة المشاريع، إتقان أدوات التحليل الإحصائي.',
+        'careers':
+            'مهندس صناعي، مهندس جودة، مهندس عمليات، مهندس سلسلة التوريد، محلل نظم، مستشار إداري.',
         'imagePath': 'assets/images/Industrial Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/2/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%D8%A9.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/2/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D8%B5%D9%86%D8%A7%D8%B9%D9%8A%D8%A9.pdf',
       },
       {
         'name': 'هندسة التعدين',
-        'description': 'هندسة التعدين تهتم بالبحث والتطوير في مجال استخراج المعادن والمعالجة.',
-        'requirements': 'معرفة بعلوم الأرض والجيولوجيا، فهم عمليات الاستخراج، السلامة المهنية، إدارة المخاطر، مهارات بيئية.',
-        'careers': 'مهندس تعدين، مهندس جيولوجيا، مهندس صيانة مناجم، أخصائي سلامة، مهندس بيئة تعدينية، مدير موارد طبيعية.',
+        'description':
+            'هندسة التعدين تهتم بالبحث والتطوير في مجال استخراج المعادن والمعالجة.',
+        'requirements':
+            'معرفة بعلوم الأرض والجيولوجيا، فهم عمليات الاستخراج، السلامة المهنية، إدارة المخاطر، مهارات بيئية.',
+        'careers':
+            'مهندس تعدين، مهندس جيولوجيا، مهندس صيانة مناجم، أخصائي سلامة، مهندس بيئة تعدينية، مدير موارد طبيعية.',
         'imagePath': 'assets/images/Mining Engineering.jpg',
         'planLink': 'https://uob.edu.sa/ar/content.php?id=26',
       },
       {
         'name': 'هندسة الطاقة المتجددة',
-        'description': 'هندسة الطاقة المتجددة تختص بتصميم وتطوير أنظمة الطاقة النظيفة مثل الطاقة الشمسية وطاقة الرياح.',
-        'requirements': 'خلفية قوية في الفيزياء والكيمياء، فهم أنظمة الطاقة، مهارات تصميم النظم الكهربائية، الوعي البيئي.',
-        'careers': 'مهندس طاقة متجددة، مهندس أنظمة شمسية، مهندس توربينات رياح، مستشار طاقة، مهندس استدامة، باحث في الطاقة النظيفة.',
+        'description':
+            'هندسة الطاقة المتجددة تختص بتصميم وتطوير أنظمة الطاقة النظيفة مثل الطاقة الشمسية وطاقة الرياح.',
+        'requirements':
+            'خلفية قوية في الفيزياء والكيمياء، فهم أنظمة الطاقة، مهارات تصميم النظم الكهربائية، الوعي البيئي.',
+        'careers':
+            'مهندس طاقة متجددة، مهندس أنظمة شمسية، مهندس توربينات رياح، مستشار طاقة، مهندس استدامة، باحث في الطاقة النظيفة.',
         'imagePath': 'assets/images/Renewable Energy Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/4/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D8%B7%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%85%D8%AA%D8%AC%D8%AF%D8%AF%D8%A9.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/4/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D8%B7%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%85%D8%AA%D8%AC%D8%AF%D8%AF%D8%A9.pdf',
       },
       {
         'name': 'الهندسة المعمارية',
-        'description': 'الهندسة المعمارية تجمع بين الفن والهندسة لتصميم المباني والمنشآت.',
-        'requirements': 'مهارات تصميمية وإبداعية، فهم المعايير الإنشائية، إتقان برامج التصميم المعماري، الوعي الجمالي والبيئي.',
-        'careers': 'مهندس معماري، مهندس إنشاءات، مصمم مباني مستدامة، مستشار هندسي معماري، مخطط حضري، مدير مشاريع عمرانية.',
+        'description':
+            'الهندسة المعمارية تجمع بين الفن والهندسة لتصميم المباني والمنشآت.',
+        'requirements':
+            'مهارات تصميمية وإبداعية، فهم المعايير الإنشائية، إتقان برامج التصميم المعماري، الوعي الجمالي والبيئي.',
+        'careers':
+            'مهندس معماري، مهندس إنشاءات، مصمم مباني مستدامة، مستشار هندسي معماري، مخطط حضري، مدير مشاريع عمرانية.',
         'imagePath': 'assets/images/Architectural Engineering.jpg',
-        'planLink': 'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/6/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D8%B9%D9%85%D8%A7%D8%B1%D9%8A%D8%A9.pdf',
+        'planLink':
+            'https://www.ub.edu.sa/ENG/Lists/ProgramsDept/Attachments/6/%D8%A7%D9%84%D8%AE%D8%B7%D8%A9%20%D8%A7%D9%84%D8%AF%D8%B1%D8%A7%D8%B3%D9%8A%D8%A9%20%D9%84%D9%84%D9%87%D9%86%D8%AF%D8%B3%D8%A9%20%D8%A7%D9%84%D9%85%D8%B9%D9%85%D8%A7%D8%B1%D9%8A%D8%A9.pdf',
       },
     ];
 
@@ -362,11 +391,11 @@ class DatabaseHelper {
     // إدراج الأسئلة
     for (var questionData in defaultQuestions) {
       final questionId = await db.insert('questions', questionData);
-      
+
       // إدراج الأوزان الافتراضية
       // كل خيار له وزن 2 للتخصص المقابل، ووزن 0 للباقي
       final majorIds = majors.map((m) => m['id'] as int).toList();
-      
+
       // خيار 1 -> تخصص 1 (المدنية) - وزن 2
       if (majorIds.isNotEmpty) {
         await db.insert('question_weights', {
@@ -376,7 +405,7 @@ class DatabaseHelper {
           'weight': 2,
         });
       }
-      
+
       // خيار 2 -> تخصص 2 (الميكانيكية) - وزن 2
       if (majorIds.length > 1) {
         await db.insert('question_weights', {
@@ -386,7 +415,7 @@ class DatabaseHelper {
           'weight': 2,
         });
       }
-      
+
       // خيار 3 -> تخصص 3 (الكهربائية) - وزن 2
       if (majorIds.length > 2) {
         await db.insert('question_weights', {
@@ -396,7 +425,7 @@ class DatabaseHelper {
           'weight': 2,
         });
       }
-      
+
       // خيار 4 -> تخصص 4 (الصناعية) - وزن 2
       if (majorIds.length > 3) {
         await db.insert('question_weights', {
@@ -407,12 +436,12 @@ class DatabaseHelper {
         });
       }
     }
-    
+
     print('DatabaseHelper: تم إدراج ${defaultQuestions.length} سؤال افتراضي');
   }
 
   // ==================== Major CRUD operations ====================
-  
+
   /// إدراج تخصص جديد في قاعدة البيانات
   /// [major]: نموذج التخصص المراد إدراجه
   /// Returns: معرف التخصص المُدرج
@@ -466,7 +495,7 @@ class DatabaseHelper {
   }
 
   // ==================== Question CRUD operations ====================
-  
+
   /// إدراج سؤال جديد في قاعدة البيانات
   /// [question]: نموذج السؤال المراد إدراجه
   /// Returns: معرف السؤال المُدرج
@@ -531,7 +560,7 @@ class DatabaseHelper {
   }
 
   // ==================== Statistics ====================
-  
+
   /// جلب عدد التخصصات في قاعدة البيانات
   /// Returns: عدد التخصصات
   Future<int> getMajorsCount() async {
@@ -562,7 +591,7 @@ class DatabaseHelper {
   }
 
   // ==================== Question Weights operations ====================
-  
+
   /// إدراج وزن جديد لخيار في سؤال
   /// [questionId]: معرف السؤال
   /// [majorId]: معرف التخصص
@@ -612,7 +641,7 @@ class DatabaseHelper {
   /// حساب النتيجة بناءً على الإجابات
   /// [answers]: قائمة بالإجابات (كل إجابة هي فهرس الخيار المختار: 0, 1, 2, 3)
   /// Returns: خريطة بمعرف التخصص والنتيجة الإجمالية {majorId: totalScore}
-  /// 
+  ///
   /// آلية العمل:
   /// 1. جلب جميع الأسئلة من قاعدة البيانات
   /// 2. لكل سؤال، جلب الأوزان المرتبطة بالخيار المختار
@@ -622,44 +651,44 @@ class DatabaseHelper {
   Future<Map<int, int>> calculateScores(List<int> answers) async {
     final db = await database;
     final scores = <int, int>{};
-    
+
     // Get all questions
     final questions = await getAllQuestions();
-    
+
     // For each answer, get weights and accumulate
     for (int i = 0; i < answers.length && i < questions.length; i++) {
       final questionId = questions[i].id;
       if (questionId == null) continue;
-      
+
       final optionIndex = answers[i];
       final weights = await db.query(
         'question_weights',
         where: 'questionId = ? AND optionIndex = ?',
         whereArgs: [questionId, optionIndex],
       );
-      
+
       for (var weight in weights) {
         final majorId = weight['majorId'] as int;
         final weightValue = weight['weight'] as int;
         scores[majorId] = (scores[majorId] ?? 0) + weightValue;
       }
     }
-    
+
     // ترتيب التخصصات حسب النتيجة واختيار أول 4 تخصصات فقط
     final sortedEntries = scores.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
-    
+
     final topFourScores = <int, int>{};
     for (int i = 0; i < sortedEntries.length && i < 4; i++) {
       topFourScores[sortedEntries[i].key] = sortedEntries[i].value;
     }
-    
+
     return topFourScores;
   }
 
   // ==================== Quiz Results operations ====================
   // لتتبع نتائج الاختبارات والإحصائيات
-  
+
   /// حفظ نتيجة اختبار في قاعدة البيانات
   /// [majorId]: معرف التخصص الذي تم اختياره
   /// يتم استدعاؤها بعد انتهاء الاختبار وحساب النتيجة
@@ -681,23 +710,28 @@ class DatabaseHelper {
   /// جلب أكثر التخصصات التي تم اختيارها
   /// [limit]: عدد التخصصات المطلوبة (افتراضياً 5)
   /// Returns: قائمة بالتخصصات مرتبة حسب عدد الاختيارات
-  /// 
+  ///
   /// مثال على النتيجة:
   /// [
   ///   {'id': 1, 'name': 'الهندسة المدنية', 'count': 10},
   ///   {'id': 2, 'name': 'الهندسة الميكانيكية', 'count': 8},
   ///   ...
   /// ]
-  Future<List<Map<String, dynamic>>> getMostSelectedMajors({int limit = 5}) async {
+  Future<List<Map<String, dynamic>>> getMostSelectedMajors({
+    int limit = 5,
+  }) async {
     final db = await database;
-    return await db.rawQuery('''
+    return await db.rawQuery(
+      '''
       SELECT m.id, m.name, COUNT(s.studentId) as count
       FROM majors m
       LEFT JOIN students s ON m.id = s.lastResult
       GROUP BY m.id, m.name
       ORDER BY count DESC
       LIMIT ?
-    ''', [limit]);
+    ''',
+      [limit],
+    );
   }
 
   // ==================== Students operations ====================
@@ -724,10 +758,7 @@ class DatabaseHelper {
     final db = await database;
     return await db.update(
       'students',
-      {
-        'name': name,
-        'updatedAt': DateTime.now().toIso8601String(),
-      },
+      {'name': name, 'updatedAt': DateTime.now().toIso8601String()},
       where: 'studentId = ?',
       whereArgs: [studentId],
     );
@@ -740,10 +771,7 @@ class DatabaseHelper {
     final db = await database;
     return await db.update(
       'students',
-      {
-        'lastResult': majorId,
-        'updatedAt': DateTime.now().toIso8601String(),
-      },
+      {'lastResult': majorId, 'updatedAt': DateTime.now().toIso8601String()},
       where: 'studentId = ?',
       whereArgs: [studentId],
     );
@@ -760,5 +788,3 @@ class DatabaseHelper {
     await db.close();
   }
 }
-
-

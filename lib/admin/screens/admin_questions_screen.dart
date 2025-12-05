@@ -276,20 +276,40 @@ class _AdminQuestionsScreenState extends State<AdminQuestionsScreen> {
                                                       border:
                                                           const OutlineInputBorder(),
                                                       isDense: true,
-                                                      helperText: 'القيم المسموحة: 0، 1، 2، 3',
+                                                      helperText:
+                                                          'القيم المسموحة: 0، 1، 2، 3',
                                                     ),
                                                     onChanged: (value) {
                                                       // التحقق من أن القيمة تكون فقط 0، 1، 2، 3
                                                       if (value.isNotEmpty) {
-                                                        final intValue = int.tryParse(value);
-                                                        if (intValue == null || intValue < 0 || intValue > 3) {
+                                                        final intValue =
+                                                            int.tryParse(value);
+                                                        if (intValue == null ||
+                                                            intValue < 0 ||
+                                                            intValue > 3) {
                                                           // إزالة الأحرف غير الصالحة
-                                                          final validValue = value.replaceAll(RegExp(r'[^0-3]'), '');
-                                                          if (validValue != value) {
-                                                            weightControllers[index][major.id]?.text = validValue;
-                                                            weightControllers[index][major.id]?.selection = TextSelection.fromPosition(
-                                                              TextPosition(offset: validValue.length),
-                                                            );
+                                                          final validValue =
+                                                              value.replaceAll(
+                                                                RegExp(
+                                                                  r'[^0-3]',
+                                                                ),
+                                                                '',
+                                                              );
+                                                          if (validValue !=
+                                                              value) {
+                                                            weightControllers[index][major
+                                                                        .id]
+                                                                    ?.text =
+                                                                validValue;
+                                                            weightControllers[index][major
+                                                                        .id]
+                                                                    ?.selection =
+                                                                TextSelection.fromPosition(
+                                                                  TextPosition(
+                                                                    offset: validValue
+                                                                        .length,
+                                                                  ),
+                                                                );
                                                           }
                                                         }
                                                       }
@@ -403,7 +423,9 @@ class _AdminQuestionsScreenState extends State<AdminQuestionsScreen> {
                                           }
                                         } else {
                                           // في حالة وجود وزن غير صالح، نستخدم 0
-                                          print('AdminQuestionsScreen: تحذير - وزن غير صالح ($weight) لخيار $optionIndex وتخصص ${major.name}، سيتم استخدام 0');
+                                          print(
+                                            'AdminQuestionsScreen: تحذير - وزن غير صالح ($weight) لخيار $optionIndex وتخصص ${major.name}، سيتم استخدام 0',
+                                          );
                                         }
                                       }
                                     }
